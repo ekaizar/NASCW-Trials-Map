@@ -1980,4 +1980,5 @@ const TRIALS_DATA =
     "Latitude": 41.5804,
     "Longitude": -75.4082
   }
-];
+]
+;
