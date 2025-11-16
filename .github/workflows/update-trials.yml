@@ -34,19 +34,9 @@ jobs:
       
       - name: Update map with new data
         run: |
-          # Create docs directory if it doesn't exist
           mkdir -p docs
-          
-          # Convert CSV to JavaScript data file
           echo "const TRIALS_DATA = " > docs/data.js
-          
-          # Convert CSV to JSON and append
-          Rscript -e '
-          library(jsonlite)
-          df <- read.csv("trials_for_google_sheets.csv")
-          cat(toJSON(df, pretty = TRUE))
-          ' >> docs/data.js
-          
+          Rscript -e 'library(jsonlite); df <- read.csv("trials_for_google_sheets.csv"); cat(toJSON(df, pretty = TRUE))' >> docs/data.js
           echo ";" >> docs/data.js
       
       - name: Commit and push if changed
@@ -54,30 +44,7 @@ jobs:
           git config --global user.name 'GitHub Actions Bot'
           git config --global user.email 'actions@github.com'
           git add -A
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update trials data [skip ci]" && git push)
-```
-
-4. **Scroll down and click "Commit changes"**
-   - Commit message: "Add auto-update workflow"
-   - Click "Commit changes"
-
-### Method 2: Upload from Your Computer
-
-Alternatively, you can upload the file I created:
-
-1. Save the workflow file from: **[.github/workflows/update-trials.yml](computer:///mnt/user-data/outputs/.github/workflows/update-trials.yml)**
-
-2. In your GitHub repository:
-   - Click "Code" tab
-   - Create folder structure: `.github/workflows/`
-   - Upload the `update-trials.yml` file there
-
----
-
-## ✅ After Adding the Workflow
-
-Within a few seconds, go back to the **Actions** tab and you should see:
-```
-All workflows (2)
-├── pages build and deployment  ← GitHub's automatic one
-└── Update Trials Map          ← YOUR custom one! ⭐
+          if ! git diff --quiet && ! git diff --staged --quiet; then
+            git commit -m "Auto-update trials data [skip ci]"
+            git push
+          fi
